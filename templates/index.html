@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GNSS Atmospheric Weather Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Python + browser GPS live prototype</p>
+        <h1>GNSS Atmospheric Weather Detection</h1>
+      </div>
+      <div class="status-pill" id="connection-status">Backend ready</div>
+    </header>
+
+    <section class="notice">
+      <strong>Location access is required.</strong>
+      Your browser supplies latitude, longitude, and accuracy. Python calculates weather-linked atmospheric estimates.
+    </section>
+
+    <section class="controls">
+      <button id="request-location">Request Location</button>
+      <button id="start-monitoring">Start Monitoring</button>
+      <button id="simulate-weather">Simulate Weather Event</button>
+      <button id="reset-system" class="secondary">Reset</button>
+    </section>
+
+    <section class="summary-grid">
+      <article>
+        <span>GPS Status</span>
+        <strong id="gps-status">Waiting for permission</strong>
+      </article>
+      <article>
+        <span>Location</span>
+        <strong id="location-info">Not available</strong>
+      </article>
+      <article>
+        <span>Browser Accuracy</span>
+        <strong id="gps-accuracy">--</strong>
+      </article>
+      <article>
+        <span>Updated</span>
+        <strong id="current-time">--</strong>
+      </article>
+    </section>
+
+    <section class="dashboard">
+      <article class="panel wide">
+        <div class="panel-header">
+          <h2>GNSS Signal Analysis</h2>
+          <span id="sat-count">0 estimated satellites</span>
+        </div>
+        <div class="metric-list">
+          <div><span>Tropospheric delay</span><strong id="tropo-delay">0.00 ns</strong></div>
+          <div><span>Ionospheric delay</span><strong id="iono-delay">0.00 ns</strong></div>
+          <div><span>Water vapor content</span><strong id="water-vapor">0.00 mm</strong></div>
+          <div><span>Signal quality</span><strong id="signal-quality">--</strong></div>
+        </div>
+        <div class="satellite-grid" id="satellite-grid"></div>
+      </article>
+
+      <article class="panel">
+        <h2>Weather Interpretation</h2>
+        <div class="metric-list">
+          <div><span>Precipitation probability</span><strong id="precip-prob">0%</strong></div>
+          <div><span>Pressure</span><strong id="pressure">--</strong></div>
+          <div><span>Humidity</span><strong id="humidity">--</strong></div>
+          <div><span>Condition</span><strong id="weather-condition">--</strong></div>
+        </div>
+        <div id="weather-alerts"></div>
+      </article>
+
+      <article class="panel">
+        <h2>Network Estimate</h2>
+        <div class="metric-list">
+          <div><span>Active nodes</span><strong id="network-nodes">1</strong></div>
+          <div><span>Coverage radius</span><strong id="coverage-radius">5.0 km</strong></div>
+          <div><span>Data accuracy</span><strong id="data-accuracy">--</strong></div>
+          <div><span>Network latency</span><strong id="network-latency">--</strong></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="visualization" id="weather-viz">
+      <h2>Atmospheric Visualization</h2>
+      <div id="visualization-content">Start monitoring to view live atmospheric estimates.</div>
+    </section>
+
+    <footer>
+      Browser GPS is live. Satellite IDs, signal strength, and atmospheric delays are modeled estimates unless you connect a native GNSS receiver that exposes raw measurements.
+    </footer>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
