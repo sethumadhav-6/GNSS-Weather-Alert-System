@@ -202,10 +202,22 @@ def weather():
 
 @app.post("/api/analyze")
 def analyze():
-    payload = request.get_json(force=True)
-    result = analyze_atmosphere(payload)
-    save_location_access(payload, result)
-    result["storage"] = {"status": "stored", "path": str(LOCATION_LOG_PATH)}
+    try:
+        payload = request.get_json(force=True) or {}
+        result = analyze_atmosphere(payload)
+    except (TypeError, ValueError, KeyError) as exc:
+        return jsonify({"error": f"Invalid location payload: {exc}"}), 400
+
+    try:
+        save_location_access(payload, result)
+        result["storage"] = {"status": "stored", "path": str(LOCATION_LOG_PATH)}
+    except OSError as exc:
+        result["storage"] = {
+            "status": "not stored",
+            "error": f"Storage error: {exc}",
+            "path": str(LOCATION_LOG_PATH),
+        }
+
     return jsonify(result)
 
 
@@ -222,5 +234,6 @@ def location_access_points():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5000"))
     app.run(host="0.0.0.0", port=port, debug=os.environ.get("FLASK_DEBUG") == "1")
+
 
 

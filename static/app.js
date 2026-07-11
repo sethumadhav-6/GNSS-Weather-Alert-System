@@ -41,7 +41,10 @@ async function analyzePosition(position, overrideWeather = null) {
         weather: lastWeather,
       }),
     });
-    if (!response.ok) throw new Error("Analysis request failed");
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Analysis request failed (${response.status}): ${detail.slice(0, 160)}`);
+    }
     lastAnalysis = await response.json();
     renderAnalysis(lastAnalysis);
     setStatus(`Live - ${lastAnalysis.weather.source}`);
@@ -122,9 +125,46 @@ function updateVisualization(probability, condition) {
   }
 }
 
-function requestLocation() {
+function showManualLocation(show = true) {
+  const manual = $("manual-location");
+  if (manual) manual.hidden = !show;
+}
+
+function explainLocationAvailability() {
+  if (!window.isSecureContext) {
+    return "Browser location needs HTTPS, localhost, or 127.0.0.1. Use HTTPS/ngrok for mobile or enter location manually below.";
+  }
   if (!navigator.geolocation) {
-    $("gps-status").textContent = "Geolocation is not supported in this browser";
+    return "Geolocation is not supported in this browser. Enter location manually below.";
+  }
+  return "";
+}
+
+function useManualLocation() {
+  const latitude = Number($("manual-latitude").value);
+  const longitude = Number($("manual-longitude").value);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    $("gps-status").textContent = "Enter valid latitude and longitude.";
+    setStatus("Manual location needed", false);
+    return;
+  }
+  analyzePosition({
+    coords: {
+      latitude,
+      longitude,
+      accuracy: 100,
+      altitude: 0,
+    },
+    timestamp: Date.now(),
+  });
+}
+
+function requestLocation() {
+  const locationProblem = explainLocationAvailability();
+  if (locationProblem) {
+    $("gps-status").textContent = locationProblem;
+    setStatus("Location unavailable", false);
+    showManualLocation(true);
     return;
   }
   $("gps-status").textContent = "Requesting permission...";
@@ -136,8 +176,11 @@ function requestLocation() {
 }
 
 function startMonitoring() {
-  if (!navigator.geolocation) {
-    $("gps-status").textContent = "Geolocation is not supported in this browser";
+  const locationProblem = explainLocationAvailability();
+  if (locationProblem) {
+    $("gps-status").textContent = locationProblem;
+    setStatus("Location unavailable", false);
+    showManualLocation(true);
     return;
   }
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
@@ -150,12 +193,14 @@ function startMonitoring() {
 }
 
 function handleLocationError(error) {
+  const secureContextMessage = explainLocationAvailability();
   const messages = {
     1: "Location permission denied. Allow location access for this site.",
-    2: "Location unavailable. Try moving outdoors or near a window.",
-    3: "Location request timed out. Try again.",
+    2: "Location unavailable. Try moving outdoors, use HTTPS for network access, or enter location manually below.",
+    3: "Location request timed out. Try again or enter location manually below.",
   };
-  $("gps-status").textContent = messages[error.code] || "Location failed";
+  $("gps-status").textContent = secureContextMessage || messages[error.code] || "Location failed. Enter location manually below.";
+  showManualLocation(true);
   setStatus("Location unavailable", false);
 }
 
@@ -206,6 +251,7 @@ $("request-location").addEventListener("click", requestLocation);
 $("start-monitoring").addEventListener("click", startMonitoring);
 $("simulate-weather").addEventListener("click", simulateWeatherEvent);
 $("reset-system").addEventListener("click", resetSystem);
+$("use-manual-location").addEventListener("click", useManualLocation);
 $("info-toggle").addEventListener("click", () => {
   const panel = $("info-panel");
   const expanded = panel.hidden;
@@ -217,4 +263,11 @@ fetch("/api/health")
   .then((response) => response.json())
   .then(() => setStatus("Backend ready"))
   .catch(() => setStatus("Backend unavailable", false));
+
+
+const initialLocationProblem = explainLocationAvailability();
+if (initialLocationProblem) {
+  $("gps-status").textContent = initialLocationProblem;
+  showManualLocation(true);
+}
 

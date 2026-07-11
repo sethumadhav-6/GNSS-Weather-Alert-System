@@ -41,6 +41,18 @@
       <button id="reset-system" class="secondary">Reset</button>
     </section>
 
+    <section class="manual-location" id="manual-location" hidden>
+      <div>
+        <label for="manual-latitude">Latitude</label>
+        <input id="manual-latitude" type="number" step="any" placeholder="12.9716">
+      </div>
+      <div>
+        <label for="manual-longitude">Longitude</label>
+        <input id="manual-longitude" type="number" step="any" placeholder="77.5946">
+      </div>
+      <button id="use-manual-location" type="button">Use Manual Location</button>
+    </section>
+
     <section class="summary-grid">
       <article>
         <span>GPS Status</span>
@@ -110,4 +122,5 @@
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
+
 

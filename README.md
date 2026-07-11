@@ -59,7 +59,16 @@ Open:
 http://localhost:5000
 ```
 
-Browser geolocation works on `localhost`. If you test from another phone on the same Wi-Fi using your PC IP address, use HTTPS or deploy to Render.
+Browser geolocation works on `localhost` and `127.0.0.1`.
+
+## Network Or Mobile Testing
+
+Browsers do not normally allow GPS/location prompts on plain `http://YOUR-PC-IP:5000`. Use one of these options:
+
+- Open the app on the same computer with `http://127.0.0.1:5000/`.
+- Use HTTPS for phone/network testing, for example Render, ngrok, Cloudflare Tunnel, or another HTTPS reverse proxy.
+- For temporary desktop Chrome testing only, add `http://YOUR-PC-IP:5000` in `chrome://flags/#unsafely-treat-insecure-origin-as-secure`, then restart Chrome.
+- If browser GPS is blocked, use the manual latitude/longitude fallback in the app.
 
 ## Deploy On Render
 
@@ -73,3 +82,4 @@ Start command: gunicorn app:app
 ```
 
 The included `render.yaml` can also be used as a blueprint.
+
