@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: dark;
   --bg: #101820;
   --panel: #182430;
@@ -34,10 +34,40 @@ body {
 
 .topbar {
   display: flex;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 20px;
+}
+
+.brand-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: 76px;
+  height: 76px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.company-name {
+  margin: 0 0 6px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
 }
 
 .eyebrow {
@@ -77,6 +107,7 @@ button {
 }
 
 .notice,
+.info-panel,
 .panel,
 .summary-grid article,
 .visualization {
@@ -93,6 +124,32 @@ button {
 
 .notice strong {
   color: var(--text);
+}
+
+.info-panel {
+  padding: 16px;
+  margin: -4px 0 18px;
+  color: var(--muted);
+}
+
+.info-panel h2 {
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.info-panel p {
+  margin: 8px 0 0;
+}
+
+.icon-button {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: var(--panel-2);
+  font-size: 1.1rem;
+  font-family: Georgia, serif;
 }
 
 .controls {
@@ -282,9 +339,16 @@ footer {
 }
 
 @media (max-width: 900px) {
-  .topbar {
+  .topbar,
+  .brand-heading,
+  .topbar-actions {
     align-items: start;
     flex-direction: column;
+  }
+
+  .brand-logo {
+    width: 64px;
+    height: 64px;
   }
 
   .summary-grid,
@@ -296,3 +360,4 @@ footer {
     grid-row: auto;
   }
 }
+

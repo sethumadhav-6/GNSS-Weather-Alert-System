@@ -1,4 +1,4 @@
-let watchId = null;
+﻿let watchId = null;
 let lastWeather = null;
 let lastAnalysis = null;
 
@@ -206,8 +206,15 @@ $("request-location").addEventListener("click", requestLocation);
 $("start-monitoring").addEventListener("click", startMonitoring);
 $("simulate-weather").addEventListener("click", simulateWeatherEvent);
 $("reset-system").addEventListener("click", resetSystem);
+$("info-toggle").addEventListener("click", () => {
+  const panel = $("info-panel");
+  const expanded = panel.hidden;
+  panel.hidden = !expanded;
+  $("info-toggle").setAttribute("aria-expanded", String(expanded));
+});
 
 fetch("/api/health")
   .then((response) => response.json())
   .then(() => setStatus("Backend ready"))
   .catch(() => setStatus("Backend unavailable", false));
+

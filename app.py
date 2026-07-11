@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import math
@@ -7,11 +7,15 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
 
 
 app = Flask(__name__)
+
+DATA_DIR = Path(os.environ.get("GPS_APP_DATA_DIR", Path(app.instance_path) / "data"))
+LOCATION_LOG_PATH = DATA_DIR / "location_access_log.jsonl"
 
 LIGHT_SPEED_M_PER_NS = 0.299792458
 
@@ -161,6 +165,23 @@ def analyze_atmosphere(payload: dict) -> dict:
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
 
+def save_location_access(payload: dict, result: dict) -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    record = {
+        "stored_at": datetime.now(timezone.utc).isoformat(),
+        "client_ip": request.headers.get("X-Forwarded-For", request.remote_addr),
+        "user_agent": request.headers.get("User-Agent", ""),
+        "location": result.get("location", {}),
+        "weather": result.get("weather", {}),
+        "analysis": {
+            "signal_quality": result.get("analysis", {}).get("signal_quality"),
+            "estimated_signal": result.get("analysis", {}).get("estimated_signal"),
+            "precipitation_probability": result.get("analysis", {}).get("precipitation_probability"),
+        },
+        "source": payload.get("source", "browser-geolocation"),
+    }
+    with LOCATION_LOG_PATH.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=True) + "\n")
 
 @app.get("/")
 def index():
@@ -182,9 +203,24 @@ def weather():
 @app.post("/api/analyze")
 def analyze():
     payload = request.get_json(force=True)
-    return jsonify(analyze_atmosphere(payload))
+    result = analyze_atmosphere(payload)
+    save_location_access(payload, result)
+    result["storage"] = {"status": "stored", "path": str(LOCATION_LOG_PATH)}
+    return jsonify(result)
+
+
+@app.get("/api/location-access-points")
+def location_access_points():
+    limit = int(request.args.get("limit", 50))
+    if not LOCATION_LOG_PATH.exists():
+        return jsonify({"points": []})
+    with LOCATION_LOG_PATH.open("r", encoding="utf-8") as handle:
+        rows = [json.loads(line) for line in handle if line.strip()]
+    return jsonify({"points": rows[-max(1, min(limit, 500)):], "count": len(rows)})
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5000"))
     app.run(host="0.0.0.0", port=port, debug=os.environ.get("FLASK_DEBUG") == "1")
+
+

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -9,16 +9,29 @@
 <body>
   <main class="shell">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Python + browser GPS live prototype</p>
-        <h1>GNSS Atmospheric Weather Detection</h1>
+      <div class="brand-heading">
+        <img class="brand-logo" src="{{ url_for('static', filename='cgs.png') }}" alt="Canopy Geospatial Solutions logo">
+        <div>
+          <p class="company-name">Canopy Geospatial Solutions</p>
+          <p class="eyebrow"></p>
+          <h1>GNSS Atmospheric Weather Detection</h1>
+        </div>
       </div>
-      <div class="status-pill" id="connection-status">Backend ready</div>
+      <div class="topbar-actions">
+        <button class="icon-button" id="info-toggle" type="button" aria-expanded="false" aria-controls="info-panel" title="Project information">i</button>
+        <div class="status-pill" id="connection-status">Backend ready</div>
+      </div>
     </header>
 
     <section class="notice">
       <strong>Location access is required.</strong>
-      Your browser supplies latitude, longitude, and accuracy. Python calculates weather-linked atmospheric estimates.
+      Your browser supplies latitude, longitude, and accuracy. Python calculates weather-linked atmospheric estimates and stores analyzed access points on the backend for later review.
+    </section>
+
+    <section class="info-panel" id="info-panel" hidden>
+      <h2>About this prototype</h2>
+      <p>Canopy Geospatial Solutions maintains this Python and browser GPS live prototype for GNSS accuracy and atmospheric weather interpretation experiments.</p>
+      <p>Each analyzed location request is stored by the Flask backend with timestamp, browser accuracy, weather context, signal quality estimate, client IP, and user agent so the information can be expanded later.</p>
     </section>
 
     <section class="controls">
@@ -90,9 +103,11 @@
     </section>
 
     <footer>
+      <strong>Maintained and owned by <a href="https://canopygs.in/">Canopy Geospatial Solutions.</a></strong>
       Browser GPS is live. Satellite IDs, signal strength, and atmospheric delays are modeled estimates unless you connect a native GNSS receiver that exposes raw measurements.
     </footer>
   </main>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
+

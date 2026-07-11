@@ -1,6 +1,13 @@
-# GNSS Atmospheric Weather Detection
+﻿# GNSS Atmospheric Weather Detection
 
-Python-backed live version of the GPS accuracy discussion.
+Python-backed live GPS accuracy prototype for Canopy Geospatial Solutions.
+
+## Branding
+
+- Company name shown in the app: Canopy Geospatial Solutions.
+- Logo asset: `static/cgs.png`.
+- Footer text: Maintained and owned by Canopy Geospatial Solutions.
+- The `i` information button explains the prototype, location access, and backend storage behavior.
 
 ## What Works Live
 
@@ -8,6 +15,30 @@ Python-backed live version of the GPS accuracy discussion.
 - Flask backend fetches current weather from Open-Meteo when internet is available.
 - Backend calculates simplified tropospheric delay, ionospheric estimate, water vapor estimate, precipitation probability, and signal quality.
 - Frontend updates continuously with `watchPosition`.
+- Each analyzed browser location is stored on the backend for later expansion and review.
+
+## Backend Location Storage
+
+Location access points are appended to:
+
+```text
+instance/data/location_access_log.jsonl
+```
+
+Each JSONL row includes timestamp, client IP, user agent, latitude, longitude, browser accuracy, altitude, weather context, signal quality estimate, and precipitation probability.
+
+Retrieve recent stored points with:
+
+```text
+GET /api/location-access-points
+GET /api/location-access-points?limit=100
+```
+
+You can change the storage directory with:
+
+```text
+GPS_APP_DATA_DIR=/path/to/data
+```
 
 ## Important Limitation
 
